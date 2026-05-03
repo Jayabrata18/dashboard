@@ -47,6 +47,9 @@ const initialState: DashboardState = {
   dateRange: getInitialDateRange(),
   selectedCategory: "All",
   budgets: DEFAULT_BUDGETS,
+  metaAds: null,
+  instagram: null,
+  inventory: null,
 };
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
@@ -110,6 +113,9 @@ function reducer(state: DashboardState, action: Action): DashboardState {
         investments: data.investments ?? state.investments,
         expenseSummary: data.expenseSummary ?? state.expenseSummary,
         expenseGrandTotal: data.expenseGrandTotal ?? state.expenseGrandTotal,
+        metaAds: data.metaAds ?? state.metaAds,
+        instagram: data.instagram ?? state.instagram,
+        inventory: data.inventory ?? state.inventory,
       };
     }
 

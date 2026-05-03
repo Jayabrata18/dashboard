@@ -4,15 +4,19 @@ import { Sidebar, Topbar } from "./components/layout";
 import { OverviewPage } from "./Pages/OverviewPage";
 import { FinancialPage } from "./Pages/FinancialPage";
 import {
-  AnalyticsPage,
-  MarketingPage,
-  InventoryPage,
-} from "./Pages/AnalyticsMarketingInventory";
+  
+  MarketingPage
+} from "./Pages/Marketing";
 import {
   BudgetPage,
   InvestmentsPage,
 } from "./Pages/BudgetInvestmentsSettings";
 import { SettingsPage } from "./Pages/Settings";
+import { AnalyticsPage } from "./Pages/Analytics";
+import { PriceCalculatorPage } from "./Pages/PriceCalculatorPage";
+import { MetaAdsPage } from "./Pages/MetaAdsPage";
+import { InstagramPage } from "./Pages/InstagramPage";
+import { InventoryPage } from "./Pages/Inventory";
 
 // ─── Inner app (needs context) ────────────────────────────────────────────────
 
@@ -36,8 +40,14 @@ function DashboardApp() {
         return <BudgetPage />;
       case "investments":
         return <InvestmentsPage />;
+      case "instagram":
+        return <InstagramPage />;
+      case "marketing":
+        return <MetaAdsPage />;
       case "settings":
         return <SettingsPage />;
+      case "calculator":
+        return <PriceCalculatorPage />;
       default:
         return <OverviewPage />;
     }

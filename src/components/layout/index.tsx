@@ -14,9 +14,11 @@ const NAV_ITEMS: { id: NavSection; icon: string; label: string }[] = [
   { id: "inventory", icon: "▣", label: "Inventory" },
   { id: "budget", icon: "◧", label: "Budget" },
   { id: "investments", icon: "◈", label: "Investments" },
+  { id: "calculator", icon: "◐", label: "Price Calculator" }, // ← new
   { id: "settings", icon: "◌", label: "Settings & Sync" },
+  { id: "marketing", icon: "◆", label: "Meta Ads" },
+  { id: "instagram", icon: "◑", label: "Instagram" },
 ];
-
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 export function Sidebar() {
