@@ -18,6 +18,8 @@ const NAV_ITEMS: { id: NavSection; icon: string; label: string }[] = [
   { id: "settings", icon: "◌", label: "Settings & Sync" },
   { id: "marketing", icon: "◆", label: "Meta Ads" },
   { id: "instagram", icon: "◑", label: "Instagram" },
+  { id: "customers", icon: "◉", label: "Customers" },
+  { id: "orders", icon: "◫", label: "Orders" },
 ];
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 

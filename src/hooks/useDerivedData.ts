@@ -205,32 +205,7 @@ export function useDerivedData() {
     const totalCurrentValue = investments.reduce((s, i) => s + i.current, 0);
     const investReturn = totalCurrentValue - totalInvested;
     const investReturnPct = totalInvested > 0 ? (investReturn / totalInvested) * 100 : 0;
-    console.log("Derived data computed: ", {
-        filteredExpenses,
-        totalExpenses,
-        totalRevenue,
-        netProfit,
-        margin,
-        monthlyData,
-        activeMths,
-        catBreakdown,
-        payBreakdown,
-        adSpend,
-        roas,
-        inventoryCost,
-        inventoryTurnover,
-        avgMonthlyBurn,
-        cashRunway,
-        revSpark,
-        expSpark,
-        heatmapData,
-        heatMax,
-        budgetActual,
-        totalInvested,
-        totalCurrentValue,
-        investReturn,
-        investReturnPct,
-    });
+  
     return {
         filteredExpenses,
         totalExpenses,

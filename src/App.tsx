@@ -17,6 +17,8 @@ import { PriceCalculatorPage } from "./Pages/PriceCalculatorPage";
 import { MetaAdsPage } from "./Pages/MetaAdsPage";
 import { InstagramPage } from "./Pages/InstagramPage";
 import { InventoryPage } from "./Pages/Inventory";
+import { CustomerPage } from "./Pages/CustomerPage";
+import { OrdersPage } from "./Pages/OrdersPage";
 
 // ─── Inner app (needs context) ────────────────────────────────────────────────
 
@@ -42,6 +44,10 @@ function DashboardApp() {
         return <InvestmentsPage />;
       case "instagram":
         return <InstagramPage />;
+      case "customers":
+        return <CustomerPage />;
+      case "orders":
+        return <OrdersPage />;
       case "marketing":
         return <MetaAdsPage />;
       case "settings":

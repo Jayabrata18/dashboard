@@ -3,12 +3,24 @@ import React from "react";
 import { Card, SectionTitle } from "../components/ui";
 import { useDashboard } from "../store/DashboardContext";
 
-const ENV_URL = import.meta.env.VITE_WEB_APP_URL || "";
-console.log("Loaded Web App URL from .env:", ENV_URL);
+const ENV_URL_1 = import.meta.env.VITE_WEB_APP_URL_1 || "";
+const ENV_URL_2 = import.meta.env.VITE_WEB_APP_URL_2 || "";
+
+// console.log("Loaded Web App URL 1 from .env:", ENV_URL_1);
+// console.log("Loaded Web App URL 2 from .env:", ENV_URL_2);
 
 export function SettingsPage() {
   const { state, fetchData } = useDashboard();
-  const { webAppUrl, syncStatus, lastSync, fetchDurationMs } = state;
+  const {
+    webAppUrl,
+    webAppUrl2,
+    syncStatus,
+    syncStatus2,
+    lastSync,
+    lastSync2,
+    fetchDurationMs,
+    fetchDurationMs2,
+  } = state;
 
   const checks = [
     {
@@ -37,16 +49,28 @@ export function SettingsPage() {
       note: "writeLog() only on sheet edit events",
     },
     {
-      check: "URL from environment",
-      status: !!ENV_URL,
-      note: ENV_URL
+      check: "Source 1 URL from environment",
+      status: !!ENV_URL_1,
+      note: ENV_URL_1
         ? "VITE_WEB_APP_URL is set ✓"
         : "VITE_WEB_APP_URL not found in .env",
     },
     {
-      check: "Valid Google domain",
+      check: "Source 2 URL from environment",
+      status: !!ENV_URL_2,
+      note: ENV_URL_2
+        ? "VITE_WEB_APP_URL_2 is set ✓"
+        : "VITE_WEB_APP_URL_2 not found in .env",
+    },
+    {
+      check: "Source 1 valid Google domain",
       status: webAppUrl?.includes("script.google.com"),
       note: webAppUrl ? "script.google.com ✓" : "URL not loaded yet",
+    },
+    {
+      check: "Source 2 valid Google domain",
+      status: webAppUrl2?.includes("script.google.com"),
+      note: webAppUrl2 ? "script.google.com ✓" : "URL not loaded yet",
     },
   ];
 
@@ -124,7 +148,7 @@ function getInvestmentsData(ss) {
     }));
 }`;
 
-  // ── Status badge ────────────────────────────────────────────────────────────
+  // ── Status badge config ──────────────────────────────────────────────────────
   const statusConfig = {
     idle: {
       color: "#64748b",
@@ -151,13 +175,61 @@ function getInvestmentsData(ss) {
       icon: "●",
     },
   };
-  const s =
-    statusConfig[syncStatus as keyof typeof statusConfig] ?? statusConfig.idle;
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* ── Connection status banner ─────────────────────────────────────── */}
-      <Card>
+  const SpinnerIcon = ({ color }: { color: string }) => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      style={{ animation: "spin 1s linear infinite" }}
+    >
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <circle
+        cx="10"
+        cy="10"
+        r="8"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeDasharray="28 8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
+  // ── Per-source row renderer ──────────────────────────────────────────────────
+  const renderSourceRow = ({
+    label,
+    envKey,
+    envUrl,
+    webUrl,
+    status,
+    lastSyncTime,
+    durationMs,
+    onRetry,
+    isLast,
+  }: {
+    label: string;
+    envKey: string;
+    envUrl: string;
+    webUrl?: string;
+    status: string;
+    lastSyncTime?: Date | null;
+    durationMs?: number | null;
+    onRetry: () => void;
+    isLast?: boolean;
+  }) => {
+    const s =
+      statusConfig[status as keyof typeof statusConfig] ?? statusConfig.idle;
+
+    return (
+      <div
+        style={{
+          paddingBottom: isLast ? 0 : 16,
+          marginBottom: isLast ? 0 : 16,
+          borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -167,7 +239,7 @@ function getInvestmentsData(ss) {
             gap: 12,
           }}
         >
-          {/* Left — title + url */}
+          {/* Left — icon + label + url */}
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div
               style={{
@@ -183,25 +255,8 @@ function getInvestmentsData(ss) {
                 flexShrink: 0,
               }}
             >
-              {syncStatus === "syncing" ? (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  style={{ animation: "spin 1s linear infinite" }}
-                >
-                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                  <circle
-                    cx="10"
-                    cy="10"
-                    r="8"
-                    fill="none"
-                    stroke={s.color}
-                    strokeWidth="2"
-                    strokeDasharray="28 8"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              {status === "syncing" ? (
+                <SpinnerIcon color={s.color} />
               ) : (
                 <span style={{ fontSize: 10 }}>{s.icon}</span>
               )}
@@ -215,38 +270,38 @@ function getInvestmentsData(ss) {
                   marginBottom: 2,
                 }}
               >
-                Google Sheet Connection
+                {label}
               </div>
               <div
                 style={{
                   fontSize: 11,
                   color: "#475569",
                   fontFamily: "monospace",
-                  maxWidth: 420,
+                  maxWidth: 380,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
               >
-                {webAppUrl || (
+                {webUrl || (
                   <span style={{ color: "#ef4444" }}>
-                    VITE_WEB_APP_URL not set in .env
+                    {envKey} not set in .env
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Right — status pill + meta + retry */}
+          {/* Right — last sync + pill + retry */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {syncStatus === "ok" && lastSync && (
+            {status === "ok" && lastSyncTime && (
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 10, color: "#475569" }}>Last sync</div>
                 <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  {lastSync.toLocaleTimeString()}
-                  {fetchDurationMs != null && (
+                  {lastSyncTime.toLocaleTimeString()}
+                  {durationMs != null && (
                     <span style={{ color: "#475569", marginLeft: 6 }}>
-                      {fetchDurationMs}ms
+                      {durationMs}ms
                     </span>
                   )}
                 </div>
@@ -267,10 +322,10 @@ function getInvestmentsData(ss) {
               {s.label}
             </span>
 
-            {webAppUrl && (
+            {webUrl && (
               <button
-                onClick={fetchData}
-                disabled={syncStatus === "syncing"}
+                onClick={onRetry}
+                disabled={status === "syncing"}
                 style={{
                   padding: "6px 14px",
                   borderRadius: 8,
@@ -289,7 +344,7 @@ function getInvestmentsData(ss) {
         </div>
 
         {/* Error hint */}
-        {syncStatus === "error" && (
+        {status === "error" && (
           <div
             style={{
               marginTop: 14,
@@ -312,7 +367,7 @@ function getInvestmentsData(ss) {
                 borderRadius: 3,
               }}
             >
-              VITE_WEB_APP_URL
+              {envKey}
             </code>{" "}
             in your{" "}
             <code
@@ -334,7 +389,7 @@ function getInvestmentsData(ss) {
         )}
 
         {/* Env not set hint */}
-        {!ENV_URL && (
+        {!envUrl && (
           <div
             style={{
               marginTop: 14,
@@ -370,10 +425,47 @@ function getInvestmentsData(ss) {
                 fontSize: 11,
               }}
             >
-              VITE_WEB_APP_URL=https://script.google.com/macros/s/YOUR_ID/exec
+              {envKey}=https://script.google.com/macros/s/YOUR_ID/exec
             </code>
           </div>
         )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* ── Combined connection status card ──────────────────────────────────── */}
+      <Card>
+        <SectionTitle
+          icon="🔌"
+          title="Google Sheet Connections"
+          subtitle="Live status for each connected data source"
+        />
+
+        {renderSourceRow({
+          label: "Source 1 — Primary Sheet",
+          envKey: "VITE_WEB_APP_URL",
+          envUrl: ENV_URL_1,
+          webUrl: webAppUrl,
+          status: syncStatus ?? "idle",
+          lastSyncTime: lastSync,
+          durationMs: fetchDurationMs,
+          onRetry: () => fetchData("source1"),
+          isLast: false,
+        })}
+
+        {renderSourceRow({
+          label: "Source 2 — Secondary Sheet",
+          envKey: "VITE_WEB_APP_URL_2",
+          envUrl: ENV_URL_2,
+          webUrl: webAppUrl2,
+          status: syncStatus2 ?? "idle",
+          lastSyncTime: lastSync2,
+          durationMs: fetchDurationMs2,
+          onRetry: () => fetchData("source2"),
+          isLast: true,
+        })}
       </Card>
 
       {/* ── Bottom row ───────────────────────────────────────────────────────── */}
@@ -442,11 +534,11 @@ function getInvestmentsData(ss) {
               },
               {
                 step: "5",
-                text: "Copy the Web App URL into your .env as VITE_WEB_APP_URL",
+                text: "Copy URL 1 into .env as VITE_WEB_APP_URL, URL 2 as VITE_WEB_APP_URL_2",
               },
               {
                 step: "6",
-                text: "Restart the dev server — it connects automatically",
+                text: "Restart the dev server — both sources connect automatically",
               },
             ].map((item) => (
               <div
@@ -487,7 +579,7 @@ function getInvestmentsData(ss) {
         <SectionTitle
           icon="📄"
           title="Code.gs — doGet() Function"
-          subtitle="Add this to your Apps Script to enable the JSON API"
+          subtitle="Add this to both Apps Scripts to enable the JSON API"
         />
         <div
           style={{
@@ -511,6 +603,7 @@ function getInvestmentsData(ss) {
             { label: "✓ Read-Only", color: "#10b981" },
             { label: "✓ No Write Ops", color: "#3b82f6" },
             { label: "✓ CORS-Safe JSON", color: "#8b5cf6" },
+            { label: "✓ Two Sources", color: "#f59e0b" },
           ].map((b) => (
             <span
               key={b.label}

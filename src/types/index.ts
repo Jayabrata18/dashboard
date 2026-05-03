@@ -53,6 +53,8 @@ export type NavSection =
     | "calculator"
     | "settings"
     | "instagram"
+    | "customers"
+    | "orders"
 
 // ─── Raw API Types ────────────────────────────────────────────────────────────
 
@@ -105,6 +107,8 @@ export interface SheetApiResponse {
     };
     instagram?: InstagramData;
     inventory?: InventoryData;
+    customers?: CustomerData;
+    orders?: OrdersData;
 }
 
 // ─── Derived / Computed Types ─────────────────────────────────────────────────
@@ -176,10 +180,16 @@ export interface DashboardState {
     expenseSummary: ExpenseSummaryRow[];
     expenseGrandTotal: ExpenseGrandTotal | null;
     webAppUrl: string;
+    webAppUrl2: string;
     syncStatus: SyncStatus;
+    syncStatus2: SyncStatus;
     lastSync: Date | null;
+    lastSync2: Date | null;
     nextSyncIn: number | null;
+    nextSyncIn2: number | null;  
+    
     fetchDurationMs: number | null;
+    fetchDurationMs2: number | null;
     activeSection: NavSection;
     sidebarOpen: boolean;
     dateRange: DateRange;
@@ -194,6 +204,8 @@ export interface DashboardState {
     } | null;
     instagram: InstagramData | null;
     inventory: InventoryData | null;
+    customers: CustomerData | null;
+    orders: OrdersData | null;
 }
 
 // ─── Instagram Types ──────────────────────────────────────────────────────────
@@ -381,3 +393,201 @@ export interface InventoryData {
     holdingCost: number;
 }
 
+// ─── Customer Types ───────────────────────────────────────────────────────────
+
+export interface CustomerSummary {
+    totalCustomers: number;
+    totalRevenue: number;
+    totalOrders: number;
+    newCustomers: number;
+    returningCustomers: number;
+    vipCustomers: number;
+    churnedCustomers: number;
+    churnRate: number;
+    avgLTV: number;
+    avgAOV: number;
+    avgOrders: number;
+    repeatRate: number;
+    top20Pct: number;
+    top20Revenue: number;
+    avgDaysToConv: number;
+}
+
+export interface CustomerMonthly {
+    month: string;
+    newCustomers: number;
+    revenue: number;
+    returning: number;
+    vip: number;
+    cumTotal: number;
+    ltv: number;
+}
+
+export interface CustomerByState {
+    state: string;
+    customers: number;
+    orders: number;
+    revenue: number;
+    lat: number;
+    lon: number;
+}
+
+export interface CustomerByCity {
+    city: string;
+    state: string;
+    customers: number;
+    orders: number;
+    revenue: number;
+}
+
+export interface CustomerSegment {
+    segment: string;
+    count: number;
+    revenue: number;
+    pct: number;
+    avgLTV: number;
+    color: string;
+}
+
+export interface CustomerCohort {
+    month: string;
+    total: number;
+    oneOrder: number;
+    twoOrders: number;
+    threeplus: number;
+    revenue: number;
+    retentionPct: number;
+    avgLTV: number;
+}
+
+export interface CustomerOrderFrequency {
+    orders: string;
+    count: number;
+    pct: number;
+}
+
+export interface CustomerData {
+    rows: any[];
+    summary: CustomerSummary;
+    monthly: CustomerMonthly[];
+    byState: CustomerByState[];
+    byCity: CustomerByCity[];
+    orderFrequency: CustomerOrderFrequency[];
+    segments: CustomerSegment[];
+    cohort: CustomerCohort[];
+    top20: any[];
+    avgDaysBetweenPurchases: number;
+}
+
+// ─── Orders Types ─────────────────────────────────────────────────────────────
+
+export interface OrderSummary {
+    totalOrders: number;
+    totalRevenue: number;
+    totalItems: number;
+    aov: number;
+    cancelledOrders: number;
+    returnedOrders: number;
+    fulfilledOrders: number;
+    paidOrders: number;
+    cancellationRate: number;
+    returnRate: number;
+    fulfillmentRate: number;
+    avgFulfillmentHours: number;
+    avgItemsPerOrder: number;
+}
+
+export interface OrderDaily {
+    date: string;
+    label: string;
+    orders: number;
+    revenue: number;
+    items: number;
+    cancelled: number;
+    fulfilled: number;
+    aov: number;
+    cancellationRate: number;
+}
+
+export interface OrderMonthly {
+    month: string;
+    orders: number;
+    revenue: number;
+    aov: number;
+    cancelled: number;
+    returned: number;
+    fulfilled: number;
+    cancellationRate: number;
+    returnRate: number;
+}
+
+export interface OrderByStatus {
+    status: string;
+    count: number;
+    revenue: number;
+    pct: number;
+    color: string;
+}
+
+export interface OrderByCity {
+    city: string;
+    state: string;
+    orders: number;
+    revenue: number;
+}
+
+export interface OrderByState {
+    state: string;
+    orders: number;
+    revenue: number;
+    customers: number;
+    lat: number;
+    lon: number;
+}
+
+export interface OrderRevenueDistribution {
+    range: string;
+    count: number;
+    pct: number;
+}
+
+export interface OrderHourly {
+    hour: number;
+    label: string;
+    orders: number;
+    revenue: number;
+    aov: number;
+}
+
+export interface OrderWeekday {
+    day: string;
+    orders: number;
+    revenue: number;
+    aov: number;
+}
+
+export interface OrderFulfillmentDistribution {
+    range: string;
+    count: number;
+    pct: number;
+}
+
+export interface OrdersData {
+    rows: any[];
+    summary: OrderSummary;
+    daily: OrderDaily[];
+    monthly: OrderMonthly[];
+    byStatus: OrderByStatus[];
+    byCity: OrderByCity[];
+    byState: OrderByState[];
+    revenueDistribution: OrderRevenueDistribution[];
+    hourly: OrderHourly[];
+    weekday: OrderWeekday[];
+    fulfillmentDistribution: OrderFulfillmentDistribution[];
+}
+
+// Add to SheetApiResponse:
+// orders?: OrdersData;
+
+// Add to DashboardState:
+// orders: OrdersData | null;
